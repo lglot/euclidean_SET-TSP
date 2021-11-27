@@ -1,0 +1,106 @@
+#!/bin/bash
+
+if test $# -ne 2
+then
+        printf "Uso: RUNME Ni Nf\nNi: Numero nodi istanza iniziale\nNf: numero nodi istanza finale\n"; exit 1;
+fi
+
+command0='eclipse.exe -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
+		grep -e "numero_backtracking" -e "tsp" -e "time" |
+		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
+command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
+		grep -e "numero_backtracking" -e "tsp" -e "time" |  	
+		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
+
+now=$(date +'%F_%H%M')
+mkdir $now
+
+output_back=$now/output_back.csv
+output_time=$now/output_time.csv
+output_sol=$now/output_sol.csv
+
+echo "sep=," | tee $output_back | tee $output_time > $output_sol	
+printf "istance,no_vincolo,normal,cross,noboth,noboth_cross,nopredtosucc,nopredtosucc_cross,nosort,nosort_cross\n" >> $output_back
+printf "istance,no_vincolo,normal,cross,noboth,noboth_cross,nopredtosucc,nopredtosucc_cross,nosort,nosort_cross\n" >> $output_time
+printf "istance,no_vincolo,normal,cross,noboth,noboth_cross,nopredtosucc,nopredtosucc_cross,nosort,nosort_cross\n" >> $output_sol
+
+
+cd ../instances-clustered
+for dir in *
+do
+	if test -d $dir && test ${dir:8:2} -le $2 && test ${dir:8:2} -ge $1
+	then
+		cd $dir
+		for instance in *.d.pl
+		do
+			printf "TSP per instaza $instance\n"
+
+			line_back="$(echo "$instance" | cut -d / -f 3)"
+			line_time="$(echo "$instance" | cut -d / -f 3)"
+			line_sol="$(echo "$instance" | cut -d / -f 3)"
+			out=($(eval $command0))
+
+			if test $? -ne 0 
+			then
+				echo "Esecuzione eclipse fallita"
+				exit 1
+			fi
+
+			count=0
+			for i in "${out[@]}"
+			do
+				case $count in
+					0) 
+						sol=$i
+						line_sol="$i";;
+
+					1) line_back="$line_back,$i";;
+					2) line_time="$line_time,$i";;
+				esac
+				count=$((count+1))
+			done
+
+			for x in $(seq 0 7)
+			do
+				choices=$(printf "%.3d" `echo "obase=2;$x" | bc`)
+				ch1=${choices:0:1}
+				ch2=${choices:1:1}
+				ch3=${choices:2:1}
+				out=($(eval $command))
+
+				if test $? -ne 0 
+				then
+					echo "Esecuzione eclipse fallita"
+					exit 1
+				fi
+
+				count=0
+				for i in "${out[@]}"
+				do
+				case $count in
+					0) 
+						if test $i=$sol
+						then
+							line_sol="$line_sol,sì"
+						else
+							line_sol="$line_sol,no"
+						fi;;
+					1) line_back="$line_back,$i";;
+					2) line_time="$line_time,$i";;
+				esac
+				count=$((count+1))
+				done
+				
+			done
+			echo $line_sol >> ../../performance_test/$output_sol
+			echo $line_back >> ../../performance_test/$output_back
+			echo $line_time >> ../../performance_test/$output_time
+		done
+		cd .. 
+	fi
+done
+cd ../performance_test
+
+python3 tsp_output.py $now | tee /dev/tty > $now/ranking_result.txt
+
+

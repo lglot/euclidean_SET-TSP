@@ -99,6 +99,7 @@ set_tsp(NCluster,Hull,InsideHull,Tsp):-
 	writeln("tsp":Tsp),
 	writeln(numero_backtracking:Back).
 
+% Construct the domain of Successor Variables with the node itself and the nodes of other clusters 
 construct_domain(SuccL):-construct_domain(1,SuccL).
 construct_domain(_,[]):-!.
 construct_domain(Node,[arc(Node,S)|SuccL]):-
@@ -110,6 +111,8 @@ construct_domain(Node,[arc(Node,S)|SuccL]):-
 	construct_domain(NodeNext,SuccL).
 
 
+% Constraints Bool Variables with the presence of node in tsp with reified contraints
+% and constraints sum of each bool in the list of a cluster to 1
 onenode_per_cluster(BSC,SuccL):-
 	onenode_per_cluster(BSC,SuccL,1).
 onenode_per_cluster([],_,_).
@@ -123,6 +126,7 @@ onenode_per_cluster([BSC|L],SuccL,I):-
 	In is I+1,
 	onenode_per_cluster(L,SuccL,In).
 
+% Finds the interior convex hull
 hull_interna(HullId,InsideHull,ConcaveCluster,NCluster):-
 	findall(p(ID,X,Y),point(ID,X,Y),Points),
 	hull_interna2(HullId,Points,InsideHull,ConcaveCluster,NCluster).

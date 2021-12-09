@@ -34,7 +34,7 @@ samelist([H1|R1], [H2|R2]):-
 
 write_list(Name,L):-
 	write(Name),
-	write(" = ["),
+	write(" : ["),
 	write_loop(L),
 	write("]\n").
 

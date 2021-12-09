@@ -8,8 +8,8 @@
 :-lib(lists).
 
 % Istance %
-:-include('instances-clustered/portcgen34/portcgen34_10.d.pl').
-
+%:-include('instances-clustered/portcgen14/portcgen14_2.d.pl').
+:-include('counterexample.d.pl').
 
 :-use_module(set_circuit).
 :-[chain].
@@ -84,7 +84,7 @@ set_tsp(NCluster,Hull,InsideHull,Tsp):-
 	ic_global_gac:inverse(OnlySuccL,PredL),
 
 	%% Optimization: The solution must go through a clockwise cycle and have no crossings
-	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,">",0,1,1),
+	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,">",0,0,0),
 	
 	
 	%%Objective function

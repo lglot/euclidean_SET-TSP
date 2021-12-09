@@ -6,10 +6,10 @@ then
 fi
 
 command0='eclipse.exe -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
-		grep -e "numero_backtracking" -e "tsp" -e "time" |
+		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
-		grep -e "numero_backtracking" -e "tsp" -e "time" |  	
+		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |  	
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 
 now=$(date +'%F_%H%M')
@@ -19,10 +19,12 @@ output_back=$now/output_back.csv
 output_time=$now/output_time.csv
 output_sol=$now/output_sol.csv
 
-echo "sep=," | tee $output_back | tee $output_time > $output_sol	
-printf "istance,no_vincolo,normal,cross,noboth,noboth_cross,nopredtosucc,nopredtosucc_cross,nosort,nosort_cross\n" >> $output_back
-printf "istance,no_vincolo,normal,cross,noboth,noboth_cross,nopredtosucc,nopredtosucc_cross,nosort,nosort_cross\n" >> $output_time
-printf "istance,no_vincolo,normal,cross,noboth,noboth_cross,nopredtosucc,nopredtosucc_cross,nosort,nosort_cross\n" >> $output_sol
+sep=";"
+echo "sep=$sep" | tee $output_back | tee $output_time > $output_sol
+header="istance;no_vincolo;noboth_cross;noboth;nopredtosucc_cross;nopredtosucc;nosort_cross;nosort;cross;normal\n"	
+printf "$header" >> $output_back
+printf "$header" >> $output_time
+printf "$header" >> $output_sol
 
 
 cd ../instances-clustered
@@ -52,10 +54,11 @@ do
 				case $count in
 					0) 
 						sol=$i
-						line_sol="$i";;
-
-					1) line_back="$line_back,$i";;
-					2) line_time="$line_time,$i";;
+						#echo $sol 
+						line_sol=$line_sol$sep"$i";;
+					1) ;;
+					2) line_back="$line_back$sep$i";;
+					3) line_time="$line_time$sep$i";;
 				esac
 				count=$((count+1))
 			done
@@ -75,22 +78,30 @@ do
 				fi
 
 				count=0
+				sn=0
+				#printf "\nConfronto\n"
 				for i in "${out[@]}"
-				do
-				case $count in
-					0) 
-						if test $i=$sol
-						then
-							line_sol="$line_sol,sì"
-						else
-							line_sol="$line_sol,no"
-						fi;;
-					1) line_back="$line_back,$i";;
-					2) line_time="$line_time,$i";;
-				esac
-				count=$((count+1))
-				done
 				
+				do
+					case $count in
+						0|1) 
+							#echo $i 
+							if [[ "$sol" == "$i" ]]
+							then
+								sn=1
+							fi;;
+						2) line_back="$line_back$sep$i";;
+						3) line_time="$line_time$sep$i";;
+					esac
+					count=$((count+1))
+				done
+
+				if test "$sn" -eq 1
+				then
+					line_sol="$line_sol${sep}sì"
+				else
+					line_sol="$line_sol${sep}no"
+				fi
 			done
 			echo $line_sol >> ../../performance_test/$output_sol
 			echo $line_back >> ../../performance_test/$output_back
@@ -101,6 +112,6 @@ do
 done
 cd ../performance_test
 
-python3 tsp_output.py $now | tee /dev/tty > $now/ranking_result.txt
+python3 tsp_output.py $now $sep | tee /dev/tty > $now/ranking_result.txt
 
 

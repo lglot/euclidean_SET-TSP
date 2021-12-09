@@ -3,9 +3,9 @@ import pprint
 import sys
 
 
-def ranking(file, str):
+def ranking(sep, file, str):
     with open(file) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
+        csv_reader = csv.reader(csv_file, delimiter=sep)
         line_count = 0
         for row in csv_reader:
             if line_count == 0:
@@ -35,16 +35,18 @@ def ranking(file, str):
 if __name__ == "__main__":
     try:
         folder = sys.argv[1]
+        sep = sys.argv[2]
     except IndexError:
         folder = ""
-    if folder == "":
+        sep = ""
+    if folder == "" or sep == "":
         print("Argument missing")
     else:
         sol = folder+'/output_sol.csv'
         back = folder+'/output_back.csv'
         time = folder+'/output_time.csv'
         with open(sol) as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
+            csv_reader = csv.reader(csv_file, delimiter=sep)
             line_count = 0
             for row in csv_reader:
                 if line_count == 0:
@@ -67,5 +69,5 @@ if __name__ == "__main__":
                     line_count += 1
             print(f'Processate {line_count} istanze.\n')
 
-        ranking(back, "Classifica a punteggio per il numero dei backtracking")
-        ranking(time, "Classifica a punteggio per il tempo di esecuzione")
+        ranking(sep,back, "Classifica a punteggio per il numero dei backtracking")
+        ranking(sep,time, "Classifica a punteggio per il tempo di esecuzione")

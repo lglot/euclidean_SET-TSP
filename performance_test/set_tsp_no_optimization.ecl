@@ -13,7 +13,7 @@
 
 :-use_module('../set_circuit').
 :-include('../chain').
-:-include('../plot').
+%:-include('../plot').
 :-include('../util').
 
 set_tsp:-

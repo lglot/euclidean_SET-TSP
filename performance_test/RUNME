@@ -5,10 +5,10 @@ then
         printf "Uso: RUNME Ni Nf\nNi: Numero nodi istanza iniziale\nNf: numero nodi istanza finale\n"; exit 1;
 fi
 
-command0='eclipse.exe -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
+command0='eclipse -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
 		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
-command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
+command='eclipse -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
 		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |  	
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 

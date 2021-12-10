@@ -9,11 +9,11 @@
 
 % Istance %
 %:-include('instances-clustered/portcgen14/portcgen14_2.d.pl').
-:-include('counterexample.d.pl').
+%:-include('counterexample.d.pl').
 
 :-use_module(set_circuit).
 :-[chain].
-:-[plot].
+%:-[plot].
 :-[util].
 :-[nocrossing_clockwise_with_choice].
 

@@ -53,16 +53,17 @@ if __name__ == "__main__":
                     line_count += 1
                 elif line_count == 1:
                     file_op = {(i-2): row[i] for i in range(2, len(row))}
+                    print(file_op)
                     line_count += 1
                 else:
                     istance = row[0]
-                    pos = 1
-                    for word in row[1:]:
-                        if ']' in word:
-                            break
-                        pos += 1
+                    #pos = 2
+                    #for word in row[1:]:
+                    #    if ']' in word:
+                    #        break
+                    #    pos += 1
 
-                    for i, word in enumerate(row[(pos+1):]):
+                    for i, word in enumerate(row[2:]):
                         if word == 'no':
                             print(
                                 f'Trovata una soluzione diversa per istanza {istance} con file {file_op[i]}')

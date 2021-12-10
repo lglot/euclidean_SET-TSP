@@ -21,7 +21,8 @@ output_sol=$now/output_sol.csv
 
 sep=";"
 echo "sep=$sep" | tee $output_back | tee $output_time > $output_sol
-header="istance;no_vincolo;noboth_cross;noboth;nopredtosucc_cross;nopredtosucc;nosort_cross;nosort;cross;normal\n"	
+#header="istance;no_vincolo;noboth_cross;noboth;nopredtosucc_cross;nopredtosucc;nosort_cross;nosort;cross;normal\n"	
+header="istance;no_vincolo;orario;orario_con_sort\n"
 printf "$header" >> $output_back
 printf "$header" >> $output_time
 printf "$header" >> $output_sol
@@ -63,9 +64,13 @@ do
 				count=$((count+1))
 			done
 
-			for x in $(seq 0 7)
+			for x in $(seq 0 1)
 			do
-				choices=$(printf "%.3d" `echo "obase=2;$x" | bc`)
+				#choices=$(printf "%.3d" `echo "obase=2;$x" | bc`)
+				case $x in 
+					0) choices=000;;
+					1) choices=010;;
+				esac
 				ch1=${choices:0:1}
 				ch2=${choices:1:1}
 				ch3=${choices:2:1}

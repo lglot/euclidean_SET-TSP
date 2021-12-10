@@ -13,7 +13,7 @@
 
 :-use_module(set_circuit).
 :-[chain].
-%:-[plot].
+:-[plot].
 :-[util].
 :-[nocrossing_clockwise_with_choice].
 

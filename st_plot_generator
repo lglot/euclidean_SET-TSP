@@ -25,7 +25,7 @@ do
 		cd $dir
 		for instance in *.d.pl
 		do
-			output_file=../../plot_result/$dir/`echo $instance | cut -f 1 -d .`.png
+			output_file=../../plot_result/$dir/`echo $instance | cut -f 1 -d .`
 			if test ! -f $output_file
 			then
 				printf "TSP per instaza $instance\n"

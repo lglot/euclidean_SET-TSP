@@ -8,18 +8,19 @@
 :-lib(lists).
 
 % Istance %
-%:-include('instances-clustered/portcgen14/portcgen14_2.d.pl').
-%:-include('counterexample.d.pl').
+:-include('instances-clustered/portcgen32/portcgen32_12.d.pl').
+%:-include('prova.d.pl').
 
 :-use_module(set_circuit).
 :-[chain].
 :-[plot].
 :-[util].
 :-[nocrossing_clockwise_with_choice].
+%:-[distance].
 
 
 set_tsp:-
-	set_tsp(_,_,_,_).
+	set_tsp(_,_,_,_,_).
 
 set_tsp(OutputFile):-
 	set_tsp(NCluster,Hull,InsideHull,Tsp),
@@ -27,6 +28,7 @@ set_tsp(OutputFile):-
 
 set_tsp(NCluster,Hull,InsideHull,Tsp):-
 	%% Nodes cardinality
+	%distance,
 	dimension(N),
 	findall(p(X,Y),point(_,X,Y),PCoordinates),
 
@@ -84,7 +86,7 @@ set_tsp(NCluster,Hull,InsideHull,Tsp):-
 	ic_global_gac:inverse(OnlySuccL,PredL),
 
 	%% Optimization: The solution must go through a clockwise cycle and have no crossings
-	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,">",0,0,0),
+	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,">",0,1,0,1),
 	
 	
 	%%Objective function
@@ -158,6 +160,8 @@ hull_interna2(HullId,Points,InsideHull,ConcaveCluster,NCluster):-
 
 cost_tsp(SuccL,CostTot):-
 	findall(c(F,T,C),cost(F,T,C),CostList),
+	length(CostList,DIM),
+	writeln(DIM),
 	(foreach(c(F,T,C),CostList), 
 		foreach(F,FromL),
 		foreach(T,ToL),

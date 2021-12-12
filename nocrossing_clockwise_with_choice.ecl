@@ -13,13 +13,14 @@
 %% nosort_cross -> Ch1=1,Ch2=0,Ch3=0
 %% noboth_cross -> Ch1=0,Ch2=0,Ch3=0
 
+%% Ch4 -> Vincolo Orario
 
-nocrossing_and_clockwise(BoolSucc,OnlySuccL,HullClusterId,ConcaveCluster,PredL,Direction,Ch1,Ch2,Ch3):-
+nocrossing_and_clockwise(BoolSucc,OnlySuccL,HullClusterId,ConcaveCluster,PredL,Direction,Ch1,Ch2,Ch3,Ch4):-
 	(Ch1=1 ->
 		pred_to_succ_propagation(1,PredL,OnlySuccL,HullClusterId,ConcaveCluster,Direction)
 	; true
 	),
-	nocrossing_and_clockwise1(1,BoolSucc,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch2,Ch3).
+	nocrossing_and_clockwise1(1,BoolSucc,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch2,Ch3,Ch4).
 
 
 %% Effettua la propagazione per il senso orario usando i predecessori:
@@ -60,8 +61,8 @@ check_remove_left_points(Xn,Yn,Xp,Yp,[Succ|SuccDomain],Direction):-
 	; fail
 	).
 
-nocrossing_and_clockwise1(_,[],_,_,_,_,_,_).
-nocrossing_and_clockwise1(I,[BSC|BSCl],OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch2,Ch3):-
+nocrossing_and_clockwise1(_,[],_,_,_,_,_,_,_).
+nocrossing_and_clockwise1(I,[BSC|BSCl],OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch2,Ch3,Ch4):-
 	(param(I),foreach(Succ,OnlySuccL), count(ID,1,_), fromto(SuccClusteredL,Out,In,[]) do
 		cluster(I,ID) -> Out=[Succ|In] ; Out=In
 	),
@@ -73,12 +74,12 @@ nocrossing_and_clockwise1(I,[BSC|BSCl],OnlySuccL,HullClusterId,ConcaveCluster,Di
 
 	ic_global:sumlist(SuccClusteredL,Somma),
 	(var(Somma) ->
-			suspend(nocrossing_and_clockwise_propagation(BSC,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch3),5,Somma->suspend:inst)
-		; 	nocrossing_and_clockwise_propagation(BSC,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch3)
+			suspend(nocrossing_and_clockwise_propagation(BSC,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch3,Ch4),5,Somma->suspend:inst)
+		; 	nocrossing_and_clockwise_propagation(BSC,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch3,Ch4)
 	),
 	
 	Inext is I + 1,
-	nocrossing_and_clockwise1(Inext,BSCl,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch2,Ch3).
+	nocrossing_and_clockwise1(Inext,BSCl,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch2,Ch3,Ch4).
 
 
 excludeNextNodeOnHull(IdCluster,SuccClusteredL,HullClusterId,ConcaveCluster,Direction):-
@@ -101,21 +102,21 @@ excludeNextNodeOnHull(IdCluster,SuccClusteredL,HullClusterId,ConcaveCluster,Dire
 
 
 
-nocrossing_and_clockwise_propagation(BSC,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch3):-
+nocrossing_and_clockwise_propagation(BSC,OnlySuccL,HullClusterId,ConcaveCluster,Direction,Ch3,Ch4):-
 	once(member(c(IdNode,1),BSC)),
 	nth1(IdNode,OnlySuccL,Succ),
 	once(point(IdNode,X0,Y0)),
 	once(point(Succ,X1,Y1)),
 	once(cluster(Cl1,IdNode)),
 	once(cluster(Cl2,Succ)),
-	remove_cross_points(IdNode,X0,Y0,X1,Y1,1,OnlySuccL,OnlySuccL,Cl1,Cl2,HullClusterId,ConcaveCluster,Direction,Ch3).
+	remove_cross_points(IdNode,X0,Y0,X1,Y1,1,OnlySuccL,OnlySuccL,Cl1,Cl2,HullClusterId,ConcaveCluster,Direction,Ch3,Ch4).
 
 
-remove_cross_points(_,_,_,_,_,_,[],_,_,_,_,_,_,_).
-remove_cross_points(Id,XA,YA,XB,YB,N,[C|L],OnlySuccL,Cl1,Cl2,HullClusterId,ConcaveCluster,Direction,Ch3):-
+remove_cross_points(_,_,_,_,_,_,[],_,_,_,_,_,_,_,_).
+remove_cross_points(Id,XA,YA,XB,YB,N,[C|L],OnlySuccL,Cl1,Cl2,HullClusterId,ConcaveCluster,Direction,Ch3,Ch4):-
 	once(point(N,Xc,Yc)),
 	SignABc is (Yc-YA)*(XB-XA) - (Xc-XA)*(YB-YA),
-	((cluster(I,Id),once(member(I,HullClusterId)),nonmember(I,ConcaveCluster)) ->
+	((Ch4=1,cluster(I,Id),once(member(I,HullClusterId)),nonmember(I,ConcaveCluster)) ->
 		(check_sign_direction(Direction,SignABc) ->
 				exclude(C,Id)
 		    ;   true
@@ -130,7 +131,7 @@ remove_cross_points(Id,XA,YA,XB,YB,N,[C|L],OnlySuccL,Cl1,Cl2,HullClusterId,Conca
 	; true
 	),
 	N1 is N+1,
-	remove_cross_points(Id,XA,YA,XB,YB,N1,L,OnlySuccL,Cl1,Cl2,HullClusterId,ConcaveCluster,Direction,Ch3).
+	remove_cross_points(Id,XA,YA,XB,YB,N1,L,OnlySuccL,Cl1,Cl2,HullClusterId,ConcaveCluster,Direction,Ch3,Ch4).
 
 check_sign_direction(Direction,Sign):-
 	(Direction="<" ->

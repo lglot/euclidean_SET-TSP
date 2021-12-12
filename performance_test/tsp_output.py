@@ -58,7 +58,7 @@ if __name__ == "__main__":
                 else:
                     istance = row[0]
                     #pos = 2
-                    #for word in row[1:]:
+                    # for word in row[1:]:
                     #    if ']' in word:
                     #        break
                     #    pos += 1
@@ -66,9 +66,9 @@ if __name__ == "__main__":
                     for i, word in enumerate(row[2:]):
                         if word == 'no':
                             print(
-                                f'Trovata una soluzione diversa per istanza {istance} con file {file_op[i]}')
+                                f'Trovata una soluzione diversa per istanza {istance} con procedura {file_op[i]}')
                     line_count += 1
             print(f'Processate {line_count} istanze.\n')
 
-        ranking(sep,back, "Classifica a punteggio per il numero dei backtracking")
-        ranking(sep,time, "Classifica a punteggio per il tempo di esecuzione")
+        ranking(sep, back, "Classifica a punteggio per il numero dei backtracking")
+        ranking(sep, time, "Classifica a punteggio per il tempo di esecuzione")

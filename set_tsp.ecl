@@ -8,7 +8,7 @@
 :-lib(lists).
 
 % Istance %
-:-include('instances-clustered/portcgen32/portcgen32_12.d.pl').
+%:-include('instances-clustered/portcgen32/portcgen32_12.d.pl').
 %:-include('prova.d.pl').
 
 :-use_module(set_circuit).
@@ -20,7 +20,7 @@
 
 
 set_tsp:-
-	set_tsp(_,_,_,_,_).
+	set_tsp(_,_,_,_).
 
 set_tsp(OutputFile):-
 	set_tsp(NCluster,Hull,InsideHull,Tsp),

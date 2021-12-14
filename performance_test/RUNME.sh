@@ -64,7 +64,7 @@ do
 				count=$((count+1))
 			done
 
-			for x in $(seq 1 15)
+			for x in $(seq 1 7)
 			do
 				choices=$(printf "%.4d" `echo "obase=2;$x" | bc`)
 				#case $x in 

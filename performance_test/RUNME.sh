@@ -9,28 +9,28 @@ command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 
 #nchoices=3;
-eclipseExec(){
-	choice=$(printf "%.choices${n}d" `echo "obase=2;(($1+4*$2))" | bc`)
-	for i in $(seq 1 $nchoices)
-	do
-		eval ch${i}=${choice:((${i}-1)):1}
-	done
-	out=($(eval $command))
-	space=" "
-	echo "${choice}${space}${out[@]}"
-}
+# eclipseExec(){
+# 	choice=$(printf "%.choices${n}d" `echo "obase=2;(($1+4*$2))" | bc`)
+# 	for i in $(seq 1 $nchoices)
+# 	do
+# 		eval ch${i}=${choice:((${i}-1)):1}
+# 	done
+# 	out=($(eval $command))
+# 	space=" "
+# 	echo "${choice}${space}${out[@]}"
+# }
 
 
-four_eclipseExec(){
-	if [$1 -ge 4]
-	then 
-		; wait
-		echo ""
-	else
-		(out=($(eclipseExec $1 $2))) & ( out2=( $(four_eclipseExec (($1 + 1)) ) ) ) 
-		echo "$out:$out2"
-	fi
-}
+# four_eclipseExec(){
+# 	if [$1 -ge 4]
+# 	then 
+# 		; wait
+# 		echo ""
+# 	else
+# 		(out=($(eclipseExec $1 $2))) & ( out2=( $(four_eclipseExec (($1 + 1)) ) ) ) 
+# 		echo "$out:$out2"
+# 	fi
+# }
 
 if test $# -ne 2
 then
@@ -79,13 +79,15 @@ do
 			
 
 			Nexec=$((2**$nchoices))
-			for x in $(seq 0 $Nexec)
+			for x in $(seq 0 $(($Nexec-1)))
 			do
-				choice=$(printf "%.choices${n}d" `echo "obase=2;$x" | bc`)
+				choice=$(printf "%.${nchoices}d" `echo "obase=2;$x" | bc`)
+				echo $choice
 				for i in $(seq 1 $nchoices)
 				do
 					eval ch${i}=${choice:((${i}-1)):1}
 				done
+				echo $ch1,$ch2,$ch3
 				out=($(eval $command))
 
 				if test $? -ne 0 
@@ -119,7 +121,7 @@ do
 					count=$((count+1))
 				done
 
-				if test "$sn" -eq 1
+				if [ $x -eq 0 ] || [ "$sn" -eq 1 ]
 				then
 					line_sol="$line_sol${sep}sì"
 				else

@@ -3,7 +3,12 @@ import pprint
 import sys
 
 
+def average(l):
+    return sum(l)/len(l)
+
+
 def ranking(sep, file, str):
+    values = []
     with open(file) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=sep)
         line_count = 0
@@ -11,9 +16,14 @@ def ranking(sep, file, str):
             if line_count == 0:
                 line_count += 1
             elif line_count == 1:
-                file_op = {(i-1): [row[i], 0] for i in range(1, len(row))}
+                file_op = {(i-1): [row[i], 0]
+                           for i in range(1, len(row))}
+                for i in range(0, len(row)-1):
+                    values.append([])
                 line_count += 1
             else:
+                for i, value in enumerate(row[1:]):
+                    values[i].append(float(value))
                 xmin = min(row[1:])
                 count = row[1:].count(xmin)
                 if count == 1:
@@ -25,7 +35,8 @@ def ranking(sep, file, str):
                             file_op[i][1] += (1/count)
 
                 line_count += 1
-        ranking = {(k+1): [v[0], round(v[1], 2)] for k, v in enumerate(sorted(
+        print(values)
+        ranking = {(k+1): [v[0], round(v[1], 2), round(average(values[k]), 2)] for k, v in enumerate(sorted(
             file_op.values(), key=lambda item: item[1], reverse=True))}
         print(str)
         pprint.pprint(ranking)

@@ -1,11 +1,13 @@
 #!/bin/bash
 
-where eclipse
+which eclipse
 
 if test $? -ne 0 
 	then
+		echo "ciao"
 		eclipseCmd="eclipse.exe"
-	else eclipseCmd="eclipse" 
+	else 
+		eclipseCmd="eclipse" 
 	fi
 
 command0='$eclipseCmd -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
@@ -15,41 +17,11 @@ command='$eclipseCmd -f $instance -f ../../performance_test/set_tsp_with_choice.
 		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |  	
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 
-#nchoices=3;
-# eclipseExec(){
-# 	choice=$(printf "%.choices${n}d" `echo "obase=2;(($1+4*$2))" | bc`)
-# 	for i in $(seq 1 $nchoices)
-# 	do
-# 		eval ch${i}=${choice:((${i}-1)):1}
-# 	done
-# 	out=($(eval $command))
-# 	space=" "
-# 	echo "${choice}${space}${out[@]}"
-# }
-
-
-# four_eclipseExec(){
-# 	if [$1 -ge 4]
-# 	then 
-# 		; wait
-# 		echo ""
-# 	else
-# 		(out=($(eclipseExec $1 $2))) & ( out2=( $(four_eclipseExec (($1 + 1)) ) ) ) 
-# 		echo "$out:$out2"
-# 	fi
-# }
-
 if test $# -ne 2
 then
         printf "Uso: RUNME Ni Nf\nNi: Numero nodi istanza iniziale\nNf: numero nodi istanza finale\n"; exit 1;
 fi
 
-command0='eclipse.exe -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
-		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |
-		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
-command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
-		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |  	
-		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 
 now=$(date +'%F_%H%M')
 mkdir $now

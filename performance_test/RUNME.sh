@@ -1,10 +1,17 @@
 #!/bin/bash
 
+where eclipse
 
-command0='eclipse.exe -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
+if test $? -ne 0 
+	then
+		eclipseCmd="eclipse.exe"
+	else eclipseCmd="eclipse" 
+	fi
+
+command0='$eclipseCmd -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
 		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
-command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
+command='$eclipseCmd -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
 		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |  	
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 
@@ -82,12 +89,12 @@ do
 			for x in $(seq 0 $(($Nexec-1)))
 			do
 				choice=$(printf "%.${nchoices}d" `echo "obase=2;$x" | bc`)
-				echo $choice
+				#echo $choice
 				for i in $(seq 1 $nchoices)
 				do
 					eval ch${i}=${choice:((${i}-1)):1}
 				done
-				echo $ch1,$ch2,$ch3
+				#echo $ch1,$ch2,$ch3
 				out=($(eval $command))
 
 				if test $? -ne 0 

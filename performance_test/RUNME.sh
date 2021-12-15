@@ -1,5 +1,37 @@
 #!/bin/bash
 
+
+command0='eclipse.exe -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
+		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |
+		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
+command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
+		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |  	
+		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
+
+#nchoices=3;
+eclipseExec(){
+	choice=$(printf "%.choices${n}d" `echo "obase=2;(($1+4*$2))" | bc`)
+	for i in $(seq 1 $nchoices)
+	do
+		eval ch${i}=${choice:((${i}-1)):1}
+	done
+	out=($(eval $command))
+	space=" "
+	echo "${choice}${space}${out[@]}"
+}
+
+
+four_eclipseExec(){
+	if [$1 -ge 4]
+	then 
+		; wait
+		echo ""
+	else
+		(out=($(eclipseExec $1 $2))) & ( out2=( $(four_eclipseExec (($1 + 1)) ) ) ) 
+		echo "$out:$out2"
+	fi
+}
+
 if test $# -ne 2
 then
         printf "Uso: RUNME Ni Nf\nNi: Numero nodi istanza iniziale\nNf: numero nodi istanza finale\n"; exit 1;
@@ -8,7 +40,7 @@ fi
 command0='eclipse.exe -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
 		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
-command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3,$ch4)" |
+command='eclipse.exe -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
 		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |  	
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 
@@ -19,10 +51,13 @@ output_back=$now/output_back.csv
 output_time=$now/output_time.csv
 output_sol=$now/output_sol.csv
 
+nchoices=3;
 sep=";"
+#Ch1 = Clockwise(C)
+#Ch2 = NoCrossing(N)
+#Ch3 = Sort(S)
 echo "sep=$sep" | tee $output_back | tee $output_time > $output_sol
-#header="istance;no_vincolo;noboth_cross;noboth;nopredtosucc_cross;nopredtosucc;nosort_cross;nosort;cross;normal\n"	
-header="istance;no_vincolo;sort\n"
+header="istance;000:None;001:S,010:N,011:NS,100:C,101:CS,110;CN,111:CNS\n"	
 printf "$header" >> $output_back
 printf "$header" >> $output_time
 printf "$header" >> $output_sol
@@ -41,40 +76,16 @@ do
 			line_back="$(echo "$instance" | cut -d / -f 3)"
 			line_time="$(echo "$instance" | cut -d / -f 3)"
 			line_sol="$(echo "$instance" | cut -d / -f 3)"
-			out=($(eval $command0))
+			
 
-			if test $? -ne 0 
-			then
-				echo "Esecuzione eclipse fallita"
-				exit 1
-			fi
-
-			count=0
-			for i in "${out[@]}"
+			Nexec=$((2**$nchoices))
+			for x in $(seq 0 $Nexec)
 			do
-				case $count in
-					0) 
-						sol=$i
-						#echo $sol 
-						line_sol=$line_sol$sep"$i";;
-					1) ;;
-					2) line_back="$line_back$sep$i";;
-					3) line_time="$line_time$sep$i";;
-				esac
-				count=$((count+1))
-			done
-
-			for x in $(seq 1 7)
-			do
-				choices=$(printf "%.4d" `echo "obase=2;$x" | bc`)
-				#case $x in 
-					#0) choices=0100;;
-					#1) choices=010;;
-				#esac
-				ch1=${choices:0:1}
-				ch2=${choices:1:1}
-				ch3=${choices:2:1}
-				ch4=${choices:3:1}
+				choice=$(printf "%.choices${n}d" `echo "obase=2;$x" | bc`)
+				for i in $(seq 1 $nchoices)
+				do
+					eval ch${i}=${choice:((${i}-1)):1}
+				done
 				out=($(eval $command))
 
 				if test $? -ne 0 
@@ -82,19 +93,25 @@ do
 					echo "Esecuzione eclipse fallita"
 					exit 1
 				fi
-
+				
 				count=0
 				sn=0
 				#printf "\nConfronto\n"
 				for i in "${out[@]}"
-				
 				do
 					case $count in
 						0|1) 
-							#echo $i 
-							if [[ "$sol" == "$i" ]]
-							then
-								sn=1
+							if [ $x -eq 0 ]
+							then 
+								if [ $count -eq 0 ]
+								then 
+							 		sol=$i
+								fi
+							else 
+								if [[ "$sol" == "$i" ]]
+								then
+									sn=1
+								fi
 							fi;;
 						2) line_back="$line_back$sep$i";;
 						3) line_time="$line_time$sep$i";;
@@ -118,6 +135,22 @@ do
 done
 cd ../performance_test
 
-python3 tsp_output.py $now $sep | tee /dev/tty > $now/ranking_result.txt
+#python3 tsp_output.py $now $sep | tee /dev/tty > $now/ranking_result.txt
 
 
+#out=($(eval $command0))
+
+# count=0
+# for i in "${out[@]}"
+# do
+# 	case $count in
+# 		0) 
+# 			sol=$i
+# 			#echo $sol 
+# 			line_sol=$line_sol$sep"$i";;
+# 		1) ;;
+# 		2) line_back="$line_back$sep$i";;
+# 		3) line_time="$line_time$sep$i";;
+# 	esac
+# 	count=$((count+1))
+# done

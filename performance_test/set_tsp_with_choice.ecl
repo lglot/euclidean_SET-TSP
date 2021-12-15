@@ -18,9 +18,9 @@
 :-include('../nocrossing_clockwise_with_choice').
 
 
-set_tsp(Ch1,Ch2,Ch3,Ch4):-
+set_tsp(Ch1,Ch2,Ch3):-
 	cputime(T1),
-	set_tsp(_,_,_,_,Ch1,Ch2,Ch3,Ch4),
+	set_tsp(_,_,_,_,Ch1,Ch2,Ch3),
 	cputime(T2),
 	Time is T2-T1,
 	writeln(time:Time).
@@ -29,7 +29,7 @@ set_tsp(Ch1,Ch2,Ch3,Ch4):-
 %	set_tsp(NCluster,Hull,InsideHull,Tsp,0,1,1),
 %	plot_tsp(NCluster,Hull,InsideHull,Tsp,OutputFile).
 
-set_tsp(NCluster,Hull,InsideHull,Tsp,Ch1,Ch2,Ch3,Ch4):-
+set_tsp(NCluster,Hull,InsideHull,Tsp,Ch1,Ch2,Ch3):-
 	%% Nodes cardinality
 	dimension(N),
 	findall(p(ID,Cluster),(point(ID,_,_),cluster(Cluster,ID)),Nodes),
@@ -88,7 +88,7 @@ set_tsp(NCluster,Hull,InsideHull,Tsp,Ch1,Ch2,Ch3,Ch4):-
 	ic_global_gac:inverse(OnlySuccL,PredL),
 
 	%% Optimization: The solution must go through a clockwise cycle and have no crossings
-	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,"<",Ch1,Ch2,Ch3,Ch4),
+	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,"<",Ch1,Ch2,Ch3),
 	
 	
 	%%Objective function

@@ -86,7 +86,7 @@ set_tsp(NCluster,Hull,InsideHull,Tsp):-
 	ic_global_gac:inverse(OnlySuccL,PredL),
 
 	%% Optimization: The solution must go through a clockwise cycle and have no crossings
-	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,">",0,1,0,1),
+	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,">",0,1,0),
 	
 	
 	%%Objective function

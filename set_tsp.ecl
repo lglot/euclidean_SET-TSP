@@ -8,7 +8,7 @@
 :-lib(lists).
 
 % Istance %
-%:-include('instances-clustered/portcgen32/portcgen32_12.d.pl').
+:-include('instances-clustered/portcgen50/portcgen50_1.d.pl').
 %:-include('prova.d.pl').
 
 :-use_module(set_circuit).
@@ -85,8 +85,15 @@ set_tsp(NCluster,Hull,InsideHull,Tsp):-
 	PredL #:: 1..N,
 	ic_global_gac:inverse(OnlySuccL,PredL),
 
-	%% Optimization: The solution must go through a clockwise cycle and have no crossings
-	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,">",0,1,0),
+	%% Optimization: this predicate apply 3 contraints based on the values of the three choice variables (boolean)
+	%% Ch1 -> Clockwise constraint
+	%% Ch2 -> CrossAbsence (Ch3=true does not admit crossing)
+	%% Ch3 -> Sort (Sorted visit of cluster as they appear in convex hull)
+	Ch1=1,
+	Ch2=1,
+	Ch3=0,
+	Senso=">"  %(">" = Clockwise ; "<" CounterClockwise)
+	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,Senso,Ch1,Ch2,Ch3),
 	
 	
 	%%Objective function

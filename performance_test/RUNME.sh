@@ -4,7 +4,6 @@ which eclipse
 
 if test $? -ne 0 
 	then
-		echo "ciao"
 		eclipseCmd="eclipse.exe"
 	else 
 		eclipseCmd="eclipse" 
@@ -36,7 +35,8 @@ sep=";"
 #Ch2 = NoCrossing(N)
 #Ch3 = Sort(S)
 echo "sep=$sep" | tee $output_back | tee $output_time > $output_sol
-header="istance;000:None;001:S,010:N,011:NS,100:C,101:CS,110;CN,111:CNS\n"	
+header="istance;000:None;001:S;010:N;011:NS;100:C;101:CS;110:CN;111:CNS\n"	
+#header="istance;110:CN\n"
 printf "$header" >> $output_back
 printf "$header" >> $output_time
 printf "$header" >> $output_sol
@@ -59,9 +59,13 @@ do
 
 			Nexec=$((2**$nchoices))
 			for x in $(seq 0 $(($Nexec-1)))
+			#for x in $(seq 1 1)
 			do
 				choice=$(printf "%.${nchoices}d" `echo "obase=2;$x" | bc`)
 				#echo $choice
+				#case $x in 
+				#	1)choice=110
+				#esac
 				for i in $(seq 1 $nchoices)
 				do
 					eval ch${i}=${choice:((${i}-1)):1}
@@ -116,7 +120,7 @@ do
 done
 cd ../performance_test
 
-#python3 tsp_output.py $now $sep | tee /dev/tty > $now/ranking_result.txt
+python3 tsp_output.py $now $sep | tee /dev/tty > $now/ranking_result.txt
 
 
 #out=($(eval $command0))

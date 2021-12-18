@@ -18,7 +18,7 @@ def ranking(sep, file, str):
             elif line_count == 1:
                 file_op = {(i-1): [row[i], 0]
                            for i in range(1, len(row))}
-                for i in range(0, len(row)-1):
+                for i in range(len(row)-1):
                     values.append([])
                 line_count += 1
             else:
@@ -35,9 +35,9 @@ def ranking(sep, file, str):
                             file_op[i][1] += (1/count)
 
                 line_count += 1
-        print(values)
-        ranking = {(k+1): [v[0], round(v[1], 2), round(average(values[k]), 2)] for k, v in enumerate(sorted(
-            file_op.values(), key=lambda item: item[1], reverse=True))}
+        # print(len(values))
+        ranking = {(k+1): [v[0], round(v[1], 2), round(average(values[k]), 2)]
+                   for k, v in file_op.items()}
         print(str)
         pprint.pprint(ranking)
         print('\n')
@@ -63,18 +63,18 @@ if __name__ == "__main__":
                 if line_count == 0:
                     line_count += 1
                 elif line_count == 1:
-                    file_op = {(i-2): row[i] for i in range(2, len(row))}
+                    file_op = {(i-1): row[i] for i in range(1, len(row))}
                     print(file_op)
                     line_count += 1
                 else:
                     istance = row[0]
-                    #pos = 2
+                    # pos = 2
                     # for word in row[1:]:
                     #    if ']' in word:
                     #        break
                     #    pos += 1
 
-                    for i, word in enumerate(row[2:]):
+                    for i, word in enumerate(row[1:]):
                         if word == 'no':
                             print(
                                 f'Trovata una soluzione diversa per istanza {istance} con procedura {file_op[i]}')

@@ -17,7 +17,7 @@ nocrossing_and_clockwise1(I,[BSC|BSCl],OnlySuccL,HullClusterId,ConcaveCluster,Di
 	%% Applico vincolo della visita ordinata sui nodi del cluster 
 	%% e che non siano all'interno della convex hull interna
 	(once(member(I,HullClusterId)),nonmember(I,ConcaveCluster) ->
-		excludeNextNodeOnHull(I,SuccClusteredL,HullClusterId,ConcaveCluster,Direction)
+		sortConstraint(I,SuccClusteredL,HullClusterId,ConcaveCluster,Direction)
 		%true
 	; true
 	),
@@ -36,7 +36,7 @@ nocrossing_and_clockwise1(I,[BSC|BSCl],OnlySuccL,HullClusterId,ConcaveCluster,Di
 	nocrossing_and_clockwise1(Inext,BSCl,OnlySuccL,HullClusterId,ConcaveCluster,Direction).
 
 %% Vincolo che impone che i nodi sulla convex hull interna vengono visitati in ordine
-excludeNextNodeOnHull(IdCluster,SuccClusteredL,HullClusterId,ConcaveCluster,Direction):-
+sortConstraint(IdCluster,SuccClusteredL,HullClusterId,ConcaveCluster,Direction):-
 	subtract(HullClusterId,ConcaveCluster,ClusterToVisitInOrder),
 	head(ClusterToVisitInOrder,Head),
     append(ClusterToVisitInOrder,[Head],ClusterToVisitInOrder2),

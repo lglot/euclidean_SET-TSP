@@ -16,7 +16,7 @@ def ranking(sep, file, str):
             if line_count == 0:
                 line_count += 1
             elif line_count == 1:
-                file_op = {(i-1): [row[i], 0]
+                file_op = {(i-1): [row[i]]
                            for i in range(1, len(row))}
                 for i in range(len(row)-1):
                     values.append([])
@@ -24,19 +24,19 @@ def ranking(sep, file, str):
             else:
                 for i, value in enumerate(row[1:]):
                     values[i].append(float(value))
-                xmin = min(row[1:])
-                count = row[1:].count(xmin)
-                if count == 1:
-                    file_op[row[1:].index(xmin)][1] += 1
-                else:
+                # xmin = min(row[1:])
+                # count = row[1:].count(xmin)
+                # if count == 1:
+                #     file_op[row[1:].index(xmin)][1] += 1
+                # else:
 
-                    for i, x in enumerate(row[1:]):
-                        if x == xmin:
-                            file_op[i][1] += (1/count)
+                #     for i, x in enumerate(row[1:]):
+                #         if x == xmin:
+                #             file_op[i][1] += (1/count)
 
                 line_count += 1
         # print(len(values))
-        ranking = {(k+1): [v[0], round(v[1], 2), round(average(values[k]), 2)]
+        ranking = {(k+1): [v[0], round(average(values[k]), 2)]
                    for k, v in file_op.items()}
         print(str)
         pprint.pprint(ranking)
@@ -44,6 +44,7 @@ def ranking(sep, file, str):
 
 
 if __name__ == "__main__":
+    
     try:
         folder = sys.argv[1]
         sep = sys.argv[2]
@@ -79,7 +80,7 @@ if __name__ == "__main__":
                             print(
                                 f'Trovata una soluzione diversa per istanza {istance} con procedura {file_op[i]}')
                     line_count += 1
-            print(f'Processate {line_count} istanze.\n')
-
-        ranking(sep, back, "Classifica a punteggio per il numero dei backtracking")
-        ranking(sep, time, "Classifica a punteggio per il tempo di esecuzione")
+            print(f'Processate {line_count-2} istanze.\n')
+        print("Test performance di tutte le combinazioni dei vincoli")
+        ranking(sep, back, "Numero medio backtracking")
+        ranking(sep, time, "Tempo medio di esecuzione")

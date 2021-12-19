@@ -1,56 +1,64 @@
 #!/bin/bash
 
-which eclipse
+if test $# -ne 3
+then
+        printf "Uso: RUNME.sh Ni Nf /path/to/instances-clustered\nNi: Numero nodi istanza iniziale\nNf: numero nodi istanza finale\n"; exit 1;
+fi
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd "$SCRIPT_DIR"
+cd ..
+PROJECT_DIR=$(pwd)
+path_to_instances_clustered=$3
+
+## Test per lanciare eclipse su WSL in Windows
+which eclipse
 if test $? -ne 0 
 	then
 		eclipseCmd="eclipse.exe"
+		PROJECT_DIR=$(wslpath -m "$PROJECT_DIR")
 	else 
 		eclipseCmd="eclipse" 
 	fi
 
-command0='$eclipseCmd -f $instance -f ../../performance_test/set_tsp_no_optimization.ecl -e "set_tsp" |
-		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |
-		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
-command='$eclipseCmd -f $instance -f ../../performance_test/set_tsp_with_choice.ecl -e "set_tsp($ch1,$ch2,$ch3)" |
+command='$eclipseCmd -f $instance -f "${PROJECT_DIR}/set_tsp.ecl" -e "set_tsp_with_choice($ch1,$ch2,$ch3)" |
 		grep -e "numero_backtracking" -e "Succ" -e "Pred" -e "time" |  	
 		cut -f 2 -d : | tr -d $"\r" | tr -d " "'
 
-if test $# -ne 2
-then
-        printf "Uso: RUNME Ni Nf\nNi: Numero nodi istanza iniziale\nNf: numero nodi istanza finale\n"; exit 1;
-fi
+
 
 
 now=$(date +'%F_%H%M')
-mkdir $now
+mkdir "$SCRIPT_DIR/$now"
 
-output_back=$now/output_back.csv
-output_time=$now/output_time.csv
-output_sol=$now/output_sol.csv
+output_back="$SCRIPT_DIR/$now/output_back.csv"
+output_time="$SCRIPT_DIR/$now/output_time.csv"
+output_sol="$SCRIPT_DIR/$now/output_sol.csv"
 
 nchoices=3;
 sep=";"
 #Ch1 = Clockwise(C)
 #Ch2 = NoCrossing(N)
 #Ch3 = Sort(S)
-echo "sep=$sep" | tee $output_back | tee $output_time > $output_sol
+echo "sep="$sep"" | tee "$output_back" | tee "$output_time" > "$output_sol"
+
+## Intestazione output - Da cambiare a mano se cambiano i vincoli da testare
 header="istance;000:None;001:S;010:N;011:NS;100:C;101:CS;110:CN;111:CNS\n"	
-#header="istance;110:CN\n"
-printf "$header" >> $output_back
-printf "$header" >> $output_time
-printf "$header" >> $output_sol
+
+printf "$header" >> "$output_back"
+printf "$header" >> "$output_time"
+printf "$header" >> "$output_sol"
 
 
-cd ../instances-clustered
+cd "$path_to_instances_clustered"
 for dir in *
 do
-	if test -d $dir && test ${dir:8:2} -le $2 && test ${dir:8:2} -ge $1
+	if test -d "$dir" && test "${dir:8:2}" -le $2 && test "${dir:8:2}" -ge "$1"
 	then
-		cd $dir
+		cd "$dir"
 		for instance in *.d.pl
 		do
-			printf "TSP per instaza $instance\n"
+			printf "TSP per instaza "$instance"\n"
 
 			line_back="$(echo "$instance" | cut -d / -f 3)"
 			line_time="$(echo "$instance" | cut -d / -f 3)"
@@ -59,20 +67,15 @@ do
 
 			Nexec=$((2**$nchoices))
 			for x in $(seq 0 $(($Nexec-1)))
-			#for x in $(seq 1 1)
 			do
 				choice=$(printf "%.${nchoices}d" `echo "obase=2;$x" | bc`)
-				#echo $choice
-				#case $x in 
-				#	1)choice=110
-				#esac
 				for i in $(seq 1 $nchoices)
 				do
 					eval ch${i}=${choice:((${i}-1)):1}
 				done
 				#echo $ch1,$ch2,$ch3
-				out=($(eval $command))
-
+				out=($(eval "$command"))
+				printf "${choice},"
 				if test $? -ne 0 
 				then
 					echo "Esecuzione eclipse fallita"
@@ -111,31 +114,12 @@ do
 					line_sol="$line_sol${sep}no"
 				fi
 			done
-			echo $line_sol >> ../../performance_test/$output_sol
-			echo $line_back >> ../../performance_test/$output_back
-			echo $line_time >> ../../performance_test/$output_time
+			echo "$line_sol" >> "$output_sol"
+			echo "$line_back" >> "$output_back"
+			echo "$line_time" >> "$output_time"
+			printf "\n"
 		done
 		cd .. 
 	fi
 done
-cd ../performance_test
-
-python3 tsp_output.py $now $sep | tee /dev/tty > $now/ranking_result.txt
-
-
-#out=($(eval $command0))
-
-# count=0
-# for i in "${out[@]}"
-# do
-# 	case $count in
-# 		0) 
-# 			sol=$i
-# 			#echo $sol 
-# 			line_sol=$line_sol$sep"$i";;
-# 		1) ;;
-# 		2) line_back="$line_back$sep$i";;
-# 		3) line_time="$line_time$sep$i";;
-# 	esac
-# 	count=$((count+1))
-# done
+python3 "$SCRIPT_DIR/tsp_output.py" "$SCRIPT_DIR/$now" "$sep" | tee /dev/tty > "$SCRIPT_DIR/$now/ranking_result.txt"

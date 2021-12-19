@@ -7,9 +7,8 @@
 :-lib(ic_kernel).
 :-lib(lists).
 
-% Istance %
-:-include('instances-clustered/portcgen50/portcgen50_1.d.pl').
-%:-include('prova.d.pl').
+% Instance %
+:-include('instances-clustered/portcgen14/portcgen14_10.d.pl').
 
 :-use_module(set_circuit).
 :-[chain].
@@ -18,15 +17,33 @@
 :-[nocrossing_clockwise_with_choice].
 %:-[distance].
 
+%% BOOLEAN USED TO CHOICE CONSTRAINTS TO APPLY:
+%% Ch1 -> clockwise (Clockwise constraint: propagation of predecessors before instantiation) 
+%% Ch2 -> CrossAbsence (Ch2=true does not admit crossing)
+%% Ch3 -> Sort (Sorted visit as convex hull)
 
 set_tsp:-
-	set_tsp(_,_,_,_).
+	Ch1=1,
+	Ch2=1,
+	Ch3=0,
+	set_tsp(_,_,_,_,Ch1,Ch2,Ch3).
 
 set_tsp(OutputFile):-
-	set_tsp(NCluster,Hull,InsideHull,Tsp),
+	Ch1=1,
+	Ch2=1,
+	Ch3=0,
+	set_tsp(NCluster,Hull,InsideHull,Tsp,Ch1,Ch2,Ch3),
 	plot_tsp(NCluster,Hull,InsideHull,Tsp,OutputFile).
 
-set_tsp(NCluster,Hull,InsideHull,Tsp):-
+
+set_tsp_with_choice(Ch1,Ch2,Ch3):-
+	cputime(T1),
+	set_tsp(_,_,_,_,Ch1,Ch2,Ch3),
+	cputime(T2),
+	Time is T2-T1,
+	writeln(time:Time).
+
+set_tsp(NCluster,Hull,InsideHull,Tsp,Ch1,Ch2,Ch3):-
 	%% Nodes cardinality
 	%distance,
 	dimension(N),
@@ -89,10 +106,7 @@ set_tsp(NCluster,Hull,InsideHull,Tsp):-
 	%% Ch1 -> Clockwise constraint
 	%% Ch2 -> CrossAbsence (Ch3=true does not admit crossing)
 	%% Ch3 -> Sort (Sorted visit of cluster as they appear in convex hull)
-	Ch1=1,
-	Ch2=1,
-	Ch3=0,
-	Senso=">"  %(">" = Clockwise ; "<" CounterClockwise)
+	Senso=">", %(">" = Clockwise ; "<" CounterClockwise)
 	nocrossing_and_clockwise(BoolSuccLClustered,OnlySuccL,HullClusterId,ConcaveCluster,PredL,Senso,Ch1,Ch2,Ch3),
 	
 	

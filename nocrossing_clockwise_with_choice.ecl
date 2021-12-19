@@ -57,7 +57,7 @@ remove_left_and_cross_points(Id,XA,YA,XB,YB,N,[C|L],OnlySuccL,Cl1,Cl2,HullCluste
 	; true
 	),
 	(Ch2=1 -> 
-		((cluster(Clust,N)) ->
+		((cluster(Clust,N),Clust\=Cl1,Clust\=Cl2) ->
 			once(cluster(Clc,N)),
 			remove_crosspath_bypoint(1,C,Clc,OnlySuccL,SignABc,XA,YA,XB,YB,Xc,Yc,Cl1,Cl2)
 		; true)

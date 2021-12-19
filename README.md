@@ -25,7 +25,7 @@ Il file set_tsp.ecl contiene il predicato main che si occupa di definire i vinco
 ### Con Plot
   
   ```console
-  eclipse(NameFile) -f set_tsp.ecl -f /path/to/instance -e "set_tsp" 
+  eclipse -f set_tsp.ecl -f /path/to/instance -e "set_tsp(NameFile)" 
   ```
 
 Se NameFile è una variabile, alla fine della ricerca  mostra a schermo il plot del set-tsp trovato , mentre se NameFile è ground salva il plot in un file con nome NameFile.png

@@ -8,7 +8,7 @@
 :-lib(lists).
 
 % Instance %
-:-include('instances-clustered/portcgen14/portcgen14_10.d.pl').
+%:-include('instances-clustered/portcgen14/portcgen14_10.d.pl').
 
 :-use_module(set_circuit).
 :-[chain].

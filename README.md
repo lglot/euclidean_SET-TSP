@@ -10,7 +10,7 @@ Utilizza alcuni vincoli per ottimizzare la ricerca:
 ## Requirements
 
 - [Eclipse Version 7.0](https://eclipseclp.org/download.html)
-- [Gnuplot](http://www.gnuplot.info/)
+- [Gnuplot](http://www.gnuplot.info/) (Facoltativo)
 
 ## How to use
 

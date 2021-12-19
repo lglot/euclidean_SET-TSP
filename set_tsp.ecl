@@ -36,12 +36,16 @@ set_tsp(OutputFile):-
 	plot_tsp(NCluster,Hull,InsideHull,Tsp,OutputFile).
 
 
-set_tsp_with_choice(Ch1,Ch2,Ch3):-
+set_tsp(Ch1,Ch2,Ch3):-
 	cputime(T1),
 	set_tsp(_,_,_,_,Ch1,Ch2,Ch3),
 	cputime(T2),
 	Time is T2-T1,
 	writeln(time:Time).
+
+set_tsp(Ch1,Ch2,Ch3,OutputFile):-
+	set_tsp(NCluster,Hull,InsideHull,Tsp,Ch1,Ch2,Ch3),
+	plot_tsp(NCluster,Hull,InsideHull,Tsp,OutputFile).
 
 set_tsp(NCluster,Hull,InsideHull,Tsp,Ch1,Ch2,Ch3):-
 	%% Nodes cardinality

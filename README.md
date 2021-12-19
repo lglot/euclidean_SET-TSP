@@ -25,12 +25,36 @@ Il file set_tsp.ecl contiene il predicato main che si occupa di definire i vinco
 ### Con Plot
   
   ```console
-  eclipse(NameFile) -f set_tsp.ecl -f /path/to/instance -e "set_tsp" 
+  eclipse -f set_tsp.ecl -f /path/to/instance -e "set_tsp(Namefile)" 
   ```
 
 Se NameFile è una variabile, alla fine della ricerca  mostra a schermo il plot del set-tsp trovato , mentre se NameFile è ground salva il plot in un file con nome NameFile.png
 
 Nota: la libreria gnuplot necessita dell'omonimo software installato sul sistema operativo: <http://www.gnuplot.info/>
+
+## Scegliere i vincoli da utilizzare
+
+Il sorver è possibile lanciarlo anche scegliendo quali vincoli di ottimizzazione utillizzare.
+Infatti è possibile lanciare dei goal con tre paramentri:
+
+- set_tsp_with_choice(ClockwiseChoice,NoCrossingChoice,SortChoice)
+
+Dove i 3 parametri corrispondo a tre variabili booleane che impongo al solver di utilizzare o non utilizzare rispoettivamente i vincoli di senso orario, assenza incroci, ordine.
+
+Esempio:
+
+```console
+eclipse -f set_tsp.ecl -f /path/to/instance -e "set_tsp(1,0,0)"
+```
+
+In questo caso la ricerca viene fatta imponendo solo il vincolo di senso orario(Clockwise).
+**Di default viene eseguito il goal "set_tsp(1,1,0)"**
+
+Se si vuole stampare anche il plot:
+
+```console
+eclipse -f set_tsp.ecl -f /path/to/instance -e "set_tsp(1,1,0,Namefile)"
+```
 
 ## Performance Test
 

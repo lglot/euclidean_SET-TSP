@@ -2,8 +2,10 @@
 
 Solver CLP(FD) che risolve il problema del SET-TSP Euclideo. 
 Utilizza alcuni vincoli per ottimizzare la ricerca:
-  - Clockwise constraint (Impone che i set che hanno almeno un nodo sulla convex hull vengano visitati in senso orario)
-  - No
+
+- Clockwise constraint (Impone che i set che hanno almeno un nodo sulla convex hull vengano visitati in senso orario)
+- Nocrossing constraint (Impone l'assenza di incroci)
+- Sorted (Impone che i set che hanno almeno un nodo sulla convex hull vengano visitati nello stesso ordine con cui appaiono nella convex hull)
 
 ## Requirements
 
